@@ -1,3 +1,0 @@
-recursive-include erpnext_lite_ops *.json *.js *.css *.svg *.html *.txt
-include README.md
-include license.txt
