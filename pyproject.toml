@@ -10,10 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-  {name = "MO"}
-]
-dependencies = [
-  "frappe~=16.0"
+  {name = "OpenAI Codex"}
 ]
 
 [tool.setuptools]
