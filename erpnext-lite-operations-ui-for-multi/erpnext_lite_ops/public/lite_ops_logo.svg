@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Lite Operations">
+  <rect width="128" height="128" rx="24" fill="#113b4a"/>
+  <rect x="18" y="24" width="92" height="18" rx="9" fill="#d7efe4"/>
+  <rect x="18" y="55" width="42" height="42" rx="10" fill="#f5b971"/>
+  <rect x="68" y="55" width="42" height="18" rx="9" fill="#6dd3ce"/>
+  <rect x="68" y="79" width="42" height="18" rx="9" fill="#d7efe4"/>
+</svg>
