@@ -22,3 +22,6 @@ include-package-data = true
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["erpnext_lite_ops*"]
+[tool.bench.frappe-dependencies]
+frappe = ">=15.0.0,<16.0.0"
+
