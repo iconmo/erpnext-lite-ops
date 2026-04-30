@@ -278,7 +278,12 @@ frappe.provide("erpnext_lite_ops");
   };
 
   lite.openPos = function () {
-    frappe.set_route("point-of-sale");
+    if (frappe.set_route) {
+      frappe.set_route("point-of-sale");
+      return;
+    }
+
+    window.location.href = "/app/point-of-sale";
   };
 
   lite.openMappedDoc = function (method, frm) {
@@ -443,11 +448,16 @@ frappe.provide("erpnext_lite_ops");
     }
   };
 
+  lite.removeCompanySwitcher = function () {
+    document.querySelectorAll(".lite-ops-company-switcher").forEach((node) => node.remove());
+  };
+
   lite.initialize = function () {
     if (!lite.isLiteUser()) {
       return;
     }
 
+    lite.removeCompanySwitcher();
     lite.scheduleNavigationPrune();
     lite.observeNavigation();
 
