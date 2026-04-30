@@ -6,7 +6,6 @@ import frappe
 from frappe import _
 
 from .constants import (
-    ALL_ALLOWED_DOCTYPES,
     APP_LABEL,
     APP_ROUTE,
     APP_TITLE,
@@ -90,25 +89,6 @@ def get_active_company(user: str | None = None, allowed_companies: Iterable[str]
     return allowed_companies[0] if allowed_companies else None
 
 
-def _ensure_company_allowed(company: str, user: str | None = None) -> str:
-    user = user or frappe.session.user
-    allowed_companies = get_allowed_companies(user)
-
-    if not company:
-        frappe.throw(_("Company is required."))
-
-    if not allowed_companies:
-        frappe.throw(_("No allowed companies are configured for this user."))
-
-    if company not in allowed_companies:
-        frappe.throw(_("You are not allowed to work in company {0}.").format(frappe.bold(company)))
-
-    if not frappe.db.exists("Company", company):
-        frappe.throw(_("Company {0} does not exist.").format(frappe.bold(company)))
-
-    return company
-
-
 def _count_for_doctype(doctype: str, active_company: str | None) -> int:
     filters = {}
     if doctype in COMPANY_SCOPED_DOCTYPES:
@@ -127,6 +107,7 @@ def _build_sections(active_company: str | None) -> list[dict]:
                 {
                     "doctype": item["doctype"],
                     "label": item["label"],
+                    "description": item.get("description") or "",
                     "company_scoped": item["company_scoped"],
                     "count": _count_for_doctype(item["doctype"], active_company),
                 }
@@ -156,28 +137,10 @@ def get_context_payload() -> dict:
         "app_route": APP_ROUTE,
         "app_title": APP_TITLE,
         "role": ROLE_NAME,
-        "companies": [{"name": company, "label": company} for company in companies],
         "active_company": active_company,
-        "has_company_access": bool(companies),
-        "company_setup_required": not bool(companies),
         "sections": _build_sections(active_company),
         "support_links": SUPPORT_LINKS,
-        "allowed_doctypes": ALL_ALLOWED_DOCTYPES,
-        "company_scoped_doctypes": COMPANY_SCOPED_DOCTYPES,
     }
-
-
-@frappe.whitelist()
-def set_active_company(company: str) -> dict:
-    if not _user_has_lite_role():
-        frappe.throw(_("You do not have access to Lite Operations."))
-
-    company = _ensure_company_allowed(company)
-
-    frappe.defaults.set_user_default("Company", company, frappe.session.user)
-    frappe.defaults.set_user_default("company", company, frappe.session.user)
-
-    return {"company": company}
 
 
 def _guess_context_label(link_doctype: str | None, link_name: str | None) -> str:
