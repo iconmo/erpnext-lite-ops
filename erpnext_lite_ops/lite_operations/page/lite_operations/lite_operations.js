@@ -20,6 +20,10 @@ frappe.pages["lite-operations"].on_page_show = function (wrapper) {
     erpnext_lite_ops.openNew("Quotation");
   });
 
+  page.set_secondary_action(__("Abrir POS"), () => {
+    erpnext_lite_ops.openPos();
+  });
+
   $target.html(`<div class="text-muted">${__("Cargando espacio simplificado...")}</div>`);
 
   erpnext_lite_ops.fetchContext(true).then((context) => {
@@ -37,50 +41,36 @@ frappe.pages["lite-operations"].on_page_show = function (wrapper) {
     $target.find("[data-open-new]").on("click", function () {
       erpnext_lite_ops.openNew($(this).data("open-new"));
     });
+
+    $target.find("[data-open-pos]").on("click", function () {
+      erpnext_lite_ops.openPos();
+    });
   });
 };
 
 function render_lite_operations(context) {
-  const heroCards = (context.companies || []).length
-    ? (context.companies || [])
-        .map((company) => {
-          const active = company.name === context.active_company ? "Activa" : "Permitida";
-          return `
-            <span class="lite-ops-chip">
-              <span>${frappe.utils.escape_html(company.label)}</span>
-              <span>${active}</span>
-            </span>
-          `;
-        })
-        .join("")
-    : `
-      <span class="lite-ops-chip lite-ops-chip-warning">
-        <span>${__("Sin empresas permitidas")}</span>
-      </span>
-    `;
-
   const sections = (context.sections || [])
     .map((section) => {
       const cards = (section.items || [])
         .map((item) => {
-          const description = item.company_scoped
-            ? context.active_company
-              ? `Empresa actual: ${frappe.utils.escape_html(context.active_company)}`
-              : "Necesita una empresa activa para mostrar datos."
-            : "Disponible para todas las empresas permitidas.";
+          const description = item.description || __("Acceso rapido a este flujo operativo.");
 
           return `
             <article class="lite-ops-card">
-              <h3>${frappe.utils.escape_html(item.label)}</h3>
-              <p>${description}</p>
-              <div class="lite-ops-count">${frappe.format(item.count || 0, { fieldtype: "Int" })}</div>
-              <div class="lite-ops-actions">
-                <button class="btn btn-default btn-sm" data-open-list="${frappe.utils.escape_html(item.doctype)}">
-                  ${__("Abrir lista")}
-                </button>
-                <button class="btn btn-primary btn-sm" data-open-new="${frappe.utils.escape_html(item.doctype)}">
-                  ${__("Nuevo")}
-                </button>
+              <div class="lite-ops-card-copy">
+                <h3>${frappe.utils.escape_html(item.label)}</h3>
+                <p>${frappe.utils.escape_html(description)}</p>
+              </div>
+              <div class="lite-ops-card-footer">
+                <div class="lite-ops-count">${frappe.format(item.count || 0, { fieldtype: "Int" })}</div>
+                <div class="lite-ops-actions">
+                  <button class="btn btn-default btn-sm" data-open-list="${frappe.utils.escape_html(item.doctype)}">
+                    ${__("Abrir lista")}
+                  </button>
+                  <button class="btn btn-primary btn-sm" data-open-new="${frappe.utils.escape_html(item.doctype)}">
+                    ${__("Nuevo")}
+                  </button>
+                </div>
               </div>
             </article>
           `;
@@ -101,19 +91,6 @@ function render_lite_operations(context) {
     })
     .join("");
 
-  const setupNotice = context.company_setup_required
-    ? `
-      <section class="lite-ops-alert">
-        <strong>${__("Configuracion pendiente")}</strong>
-        <span>
-          ${__(
-            "Este usuario necesita permisos de Company para que el selector, los filtros y los documentos empresariales funcionen correctamente."
-          )}
-        </span>
-      </section>
-    `
-    : "";
-
   const supportLinks = (context.support_links || [])
     .map((link) => {
       return `
@@ -126,25 +103,21 @@ function render_lite_operations(context) {
 
   return `
     <div class="lite-ops-page">
-      <div class="lite-ops-hero">
-        <section class="lite-ops-panel">
+      <section class="lite-ops-hero">
+        <div class="lite-ops-hero-copy">
+          <span class="lite-ops-kicker">${__("Ventas, compras y caja")}</span>
           <h1>${frappe.utils.escape_html(context.app_label || "Operaciones Lite")}</h1>
           <p>
-            Vista operativa simplificada para usuarios que trabajan con ventas y compras sin cargar toda la interfaz estandar de ERPNext.
+            Vista operativa simplificada para trabajar rapido con ventas, compras y punto de venta sin cargar toda la interfaz estandar de ERPNext.
           </p>
-          <div class="lite-ops-chip-row">${heroCards}</div>
-        </section>
-        <section class="lite-ops-panel lite-ops-secondary-panel">
-          <h2>${__("Empresa actual")}</h2>
-          <div class="lite-ops-count">${frappe.utils.escape_html(context.active_company || "Sin activar")}</div>
-          <p class="muted">
-            El selector fijo de la esquina superior cambia listas, valores por defecto y acceso a documentos con campo <code>company</code>.
-          </p>
-        </section>
-      </div>
+        </div>
+        <div class="lite-ops-hero-actions">
+          <button class="btn btn-primary btn-lg" data-open-pos="1">${__("Abrir POS")}</button>
+          <button class="btn btn-default btn-lg" data-open-new="Quotation">${__("Nuevo presupuesto")}</button>
+        </div>
+      </section>
 
       <div class="lite-ops-sections">
-        ${setupNotice}
         ${sections}
         <section class="lite-ops-section">
           <div class="lite-ops-section-header">
