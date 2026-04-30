@@ -3,6 +3,7 @@ APP_ROUTE = "lite-operations"
 APP_TITLE = "Lite Operations"
 APP_LABEL = "Operaciones Lite"
 APP_LOGO = "/assets/erpnext_lite_ops/lite_ops_logo.svg"
+ALLOWED_ROUTES = ["point-of-sale"]
 
 TOP_LEVEL_DOCTYPES = [
     "Item",
@@ -10,16 +11,20 @@ TOP_LEVEL_DOCTYPES = [
     "Supplier",
     "Quotation",
     "Sales Order",
+    "Delivery Note",
     "Sales Invoice",
     "Purchase Order",
+    "Purchase Receipt",
     "Purchase Invoice",
 ]
 
 TRANSACTION_DOCTYPES = [
     "Quotation",
     "Sales Order",
+    "Delivery Note",
     "Sales Invoice",
     "Purchase Order",
+    "Purchase Receipt",
     "Purchase Invoice",
 ]
 
@@ -48,9 +53,24 @@ PAGE_SECTIONS = [
         "label": "Datos base",
         "description": "Catalogos y terceros para trabajar a diario.",
         "items": [
-            {"doctype": "Item", "label": "Articulos", "company_scoped": False},
-            {"doctype": "Customer", "label": "Clientes", "company_scoped": False},
-            {"doctype": "Supplier", "label": "Proveedores", "company_scoped": False},
+            {
+                "doctype": "Item",
+                "label": "Articulos",
+                "description": "Catalogo maestro para productos y servicios.",
+                "company_scoped": False,
+            },
+            {
+                "doctype": "Customer",
+                "label": "Clientes",
+                "description": "Base de clientes para presupuestos, pedidos y facturas.",
+                "company_scoped": False,
+            },
+            {
+                "doctype": "Supplier",
+                "label": "Proveedores",
+                "description": "Contactos de compra y abastecimiento operativo.",
+                "company_scoped": False,
+            },
         ],
     },
     {
@@ -58,9 +78,30 @@ PAGE_SECTIONS = [
         "label": "Ventas",
         "description": "Flujo comercial desde presupuesto hasta factura.",
         "items": [
-            {"doctype": "Quotation", "label": "Presupuestos", "company_scoped": True},
-            {"doctype": "Sales Order", "label": "Pedidos de venta", "company_scoped": True},
-            {"doctype": "Sales Invoice", "label": "Facturas de venta", "company_scoped": True},
+            {
+                "doctype": "Quotation",
+                "label": "Presupuestos",
+                "description": "Ofertas y propuestas comerciales listas para convertir.",
+                "company_scoped": True,
+            },
+            {
+                "doctype": "Sales Order",
+                "label": "Pedidos de venta",
+                "description": "Pedidos confirmados para ejecucion y seguimiento.",
+                "company_scoped": True,
+            },
+            {
+                "doctype": "Delivery Note",
+                "label": "Albaranes de entrega",
+                "description": "Salidas y entregas de mercancia para clientes.",
+                "company_scoped": True,
+            },
+            {
+                "doctype": "Sales Invoice",
+                "label": "Facturas de venta",
+                "description": "Facturas finales y cobros del circuito comercial.",
+                "company_scoped": True,
+            },
         ],
     },
     {
@@ -68,8 +109,24 @@ PAGE_SECTIONS = [
         "label": "Compras",
         "description": "Documentos de proveedores y compras operativas.",
         "items": [
-            {"doctype": "Purchase Order", "label": "Pedidos de compra", "company_scoped": True},
-            {"doctype": "Purchase Invoice", "label": "Facturas de compra", "company_scoped": True},
+            {
+                "doctype": "Purchase Order",
+                "label": "Pedidos de compra",
+                "description": "Encargos a proveedor pendientes o en curso.",
+                "company_scoped": True,
+            },
+            {
+                "doctype": "Purchase Receipt",
+                "label": "Recepciones de compra",
+                "description": "Entradas y recepciones de mercancia desde proveedor.",
+                "company_scoped": True,
+            },
+            {
+                "doctype": "Purchase Invoice",
+                "label": "Facturas de compra",
+                "description": "Facturas recibidas para control y contabilizacion.",
+                "company_scoped": True,
+            },
         ],
     },
 ]
