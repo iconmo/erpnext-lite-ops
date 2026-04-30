@@ -1,3 +1,3 @@
-erpnext_lite_ops.extendListViewSettings("Purchase Taxes and Charges Template", {
+erpnext_lite_ops.extendListViewSettings("Purchase Order", {
   company_field: "company",
 });
