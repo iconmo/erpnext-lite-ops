@@ -30,7 +30,7 @@ frappe.pages["lite-operations"].on_page_show = function (wrapper) {
     open_new_doc("Quotation");
   });
 
-  page.set_secondary_action(__("Abrir POS"), () => {
+  page.set_secondary_action(__("Abrir Caja"), () => {
     open_pos_route();
   });
 
@@ -78,7 +78,7 @@ function ensure_lite_ops_inline_styles() {
       padding: 1.25rem !important;
       border-radius: 28px !important;
       background:
-        radial-gradient(circle at top right, rgba(89, 135, 157, 0.2), transparent 32%),
+        radial-gradient(circle at top right, rgba(224, 193, 149, 0.2), transparent 32%),
         linear-gradient(180deg, #172127 0%, #1f2b32 100%) !important;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
     }
@@ -91,11 +91,11 @@ function ensure_lite_ops_inline_styles() {
       gap: 1rem !important;
       padding: 1.6rem !important;
       margin-bottom: 1.25rem !important;
-      border: 1px solid rgba(212, 230, 238, 0.1) !important;
+      border: 1px solid rgba(240, 223, 192, 0.14) !important;
       border-radius: 24px !important;
-      background: linear-gradient(145deg, #274857 0%, #315666 100%) !important;
+      background: linear-gradient(145deg, #4b3a30 0%, #7b664c 100%) !important;
       color: #f3f8fb !important;
-      box-shadow: 0 22px 44px rgba(11, 19, 24, 0.26) !important;
+      box-shadow: 0 22px 44px rgba(20, 15, 12, 0.3) !important;
     }
 
     .layout-main-section .lite-ops-hero-copy {
@@ -457,11 +457,11 @@ function render_lite_operations(context) {
           <span class="lite-ops-kicker">${__("Ventas, compras y caja")}</span>
           <h1>${frappe.utils.escape_html(context.app_label || "Operaciones Lite")}</h1>
           <p>
-            Vista operativa simplificada para trabajar rapido con ventas, compras y punto de venta sin cargar toda la interfaz estandar de ERPNext.
+            Vista operativa simplificada para trabajar rapido con ventas, compras y caja sin cargar toda la interfaz estandar de ERPNext.
           </p>
         </div>
         <div class="lite-ops-hero-actions">
-          <button class="btn btn-primary btn-lg" data-open-pos="1">${__("Abrir POS")}</button>
+          <button class="btn btn-primary btn-lg" data-open-pos="1">${__("Abrir Caja")}</button>
           <button class="btn btn-default btn-lg" data-open-new="Quotation">${__("Nuevo presupuesto")}</button>
         </div>
       </section>
