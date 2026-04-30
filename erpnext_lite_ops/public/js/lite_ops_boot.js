@@ -42,6 +42,7 @@ frappe.provide("erpnext_lite_ops");
     lastRedirectKey: null,
     navigationObserver: null,
     navigationTimer: null,
+    switcherObserver: null,
   };
 
   lite.slug = function (value) {
@@ -215,7 +216,28 @@ frappe.provide("erpnext_lite_ops");
     target.setAttribute("data-lite-ops-hidden", "1");
   };
 
+  lite.removeCompanySwitcher = function () {
+    document.querySelectorAll(".lite-ops-company-switcher").forEach((node) => node.remove());
+  };
+
+  lite.observeCompanySwitcher = function () {
+    if (lite.state.switcherObserver || !window.MutationObserver) {
+      return;
+    }
+
+    lite.state.switcherObserver = new MutationObserver(() => {
+      lite.removeCompanySwitcher();
+    });
+
+    lite.state.switcherObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  };
+
   lite.pruneNavigation = function (root = document) {
+    lite.removeCompanySwitcher();
+
     if (!lite.isLiteUser() || !root?.querySelectorAll) {
       return;
     }
@@ -225,6 +247,8 @@ frappe.provide("erpnext_lite_ops");
   };
 
   lite.scheduleNavigationPrune = function () {
+    lite.removeCompanySwitcher();
+
     if (!lite.isLiteUser()) {
       return;
     }
@@ -234,6 +258,7 @@ frappe.provide("erpnext_lite_ops");
     }
 
     lite.state.navigationTimer = window.setTimeout(() => {
+      lite.removeCompanySwitcher();
       lite.pruneNavigation(document);
     }, 120);
   };
@@ -448,16 +473,33 @@ frappe.provide("erpnext_lite_ops");
     }
   };
 
-  lite.removeCompanySwitcher = function () {
-    document.querySelectorAll(".lite-ops-company-switcher").forEach((node) => node.remove());
+  lite.extendListViewSettings = function (doctype, config = {}) {
+    const existing = frappe.listview_settings[doctype] || {};
+    const previousOnload = existing.onload;
+
+    frappe.listview_settings[doctype] = Object.assign({}, existing, {
+      onload(listview) {
+        if (typeof previousOnload === "function") {
+          previousOnload.call(this, listview);
+        }
+
+        if (!window.erpnext_lite_ops) {
+          return;
+        }
+
+        lite.applyListLiteMode(listview, config);
+      },
+    });
   };
 
   lite.initialize = function () {
+    lite.removeCompanySwitcher();
+    lite.observeCompanySwitcher();
+
     if (!lite.isLiteUser()) {
       return;
     }
 
-    lite.removeCompanySwitcher();
     lite.scheduleNavigationPrune();
     lite.observeNavigation();
 
