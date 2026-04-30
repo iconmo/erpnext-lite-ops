@@ -11,8 +11,10 @@ frappe.provide("erpnext_lite_ops");
     "Supplier",
     "Quotation",
     "Sales Order",
+    "Delivery Note",
     "Sales Invoice",
     "Purchase Order",
+    "Purchase Receipt",
     "Purchase Invoice",
     "Contact",
     "Address",
@@ -22,22 +24,25 @@ frappe.provide("erpnext_lite_ops");
     "Purchase Taxes and Charges Template",
     "Payment Terms Template",
   ];
+  lite.allowedRoutes = ["point-of-sale"];
   lite.companyScopedDoctypes = [
     "Quotation",
     "Sales Order",
+    "Delivery Note",
     "Sales Invoice",
     "Purchase Order",
+    "Purchase Receipt",
     "Purchase Invoice",
     "Sales Taxes and Charges Template",
     "Purchase Taxes and Charges Template",
   ];
   lite.state = {
     context: null,
-    switcherReady: false,
     guardReady: false,
     lastRedirectKey: null,
     navigationObserver: null,
     navigationTimer: null,
+    switcherObserver: null,
   };
 
   lite.slug = function (value) {
@@ -56,6 +61,9 @@ frappe.provide("erpnext_lite_ops");
       lite.state.allowedRouteSegments = new Set([lite.route]);
       lite.allowedDoctypes.forEach((doctype) => {
         lite.state.allowedRouteSegments.add(lite.slug(doctype));
+      });
+      lite.allowedRoutes.forEach((route) => {
+        lite.state.allowedRouteSegments.add(String(route || "").toLowerCase());
       });
     }
 
@@ -93,7 +101,12 @@ frappe.provide("erpnext_lite_ops");
   };
 
   lite.getActiveCompany = function () {
-    return lite.state.context?.active_company || frappe.defaults.get_user_default("Company") || null;
+    return (
+      lite.state.context?.active_company ||
+      frappe.defaults.get_user_default("Company") ||
+      frappe.defaults.get_user_default("company") ||
+      null
+    );
   };
 
   lite.allowRoute = function (route) {
@@ -203,7 +216,28 @@ frappe.provide("erpnext_lite_ops");
     target.setAttribute("data-lite-ops-hidden", "1");
   };
 
+  lite.removeCompanySwitcher = function () {
+    document.querySelectorAll(".lite-ops-company-switcher").forEach((node) => node.remove());
+  };
+
+  lite.observeCompanySwitcher = function () {
+    if (lite.state.switcherObserver || !window.MutationObserver) {
+      return;
+    }
+
+    lite.state.switcherObserver = new MutationObserver(() => {
+      lite.removeCompanySwitcher();
+    });
+
+    lite.state.switcherObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  };
+
   lite.pruneNavigation = function (root = document) {
+    lite.removeCompanySwitcher();
+
     if (!lite.isLiteUser() || !root?.querySelectorAll) {
       return;
     }
@@ -213,6 +247,8 @@ frappe.provide("erpnext_lite_ops");
   };
 
   lite.scheduleNavigationPrune = function () {
+    lite.removeCompanySwitcher();
+
     if (!lite.isLiteUser()) {
       return;
     }
@@ -222,6 +258,7 @@ frappe.provide("erpnext_lite_ops");
     }
 
     lite.state.navigationTimer = window.setTimeout(() => {
+      lite.removeCompanySwitcher();
       lite.pruneNavigation(document);
     }, 120);
   };
@@ -263,6 +300,15 @@ frappe.provide("erpnext_lite_ops");
 
     frappe.route_options = routeDefaults;
     frappe.set_route("Form", doctype, "new");
+  };
+
+  lite.openPos = function () {
+    if (frappe.set_route) {
+      frappe.set_route("point-of-sale");
+      return;
+    }
+
+    window.location.href = "/app/point-of-sale";
   };
 
   lite.openMappedDoc = function (method, frm) {
@@ -427,84 +473,33 @@ frappe.provide("erpnext_lite_ops");
     }
   };
 
-  lite.renderCompanySwitcher = function () {
-    if (!lite.isLiteUser()) {
-      return;
-    }
+  lite.extendListViewSettings = function (doctype, config = {}) {
+    const existing = frappe.listview_settings[doctype] || {};
+    const previousOnload = existing.onload;
 
-    if (lite.state.switcherReady && document.querySelector(".lite-ops-company-switcher")) {
-      return;
-    }
+    frappe.listview_settings[doctype] = Object.assign({}, existing, {
+      onload(listview) {
+        if (typeof previousOnload === "function") {
+          previousOnload.call(this, listview);
+        }
 
-    lite.fetchContext().then((context) => {
-      if (!context) {
-        return;
-      }
+        if (!window.erpnext_lite_ops) {
+          return;
+        }
 
-      const existing = document.querySelector(".lite-ops-company-switcher");
-      if (existing) {
-        existing.remove();
-      }
-
-      const wrap = document.createElement("div");
-      wrap.className = "lite-ops-company-switcher";
-      wrap.innerHTML = `
-        <label for="lite-ops-company-select">${__("Empresa")}</label>
-        <select id="lite-ops-company-select"></select>
-      `;
-
-      const select = wrap.querySelector("select");
-      if (!context.companies?.length) {
-        const emptyOption = document.createElement("option");
-        emptyOption.value = "";
-        emptyOption.textContent = __("Sin empresas permitidas");
-        emptyOption.selected = true;
-        emptyOption.disabled = true;
-        select.appendChild(emptyOption);
-        select.disabled = true;
-        wrap.classList.add("is-disabled");
-      } else {
-        (context.companies || []).forEach((company) => {
-          const option = document.createElement("option");
-          option.value = company.name;
-          option.textContent = company.label;
-          option.selected = company.name === context.active_company;
-          select.appendChild(option);
-        });
-      }
-
-      select.addEventListener("change", () => {
-        frappe
-          .call({
-            method: "erpnext_lite_ops.api.set_active_company",
-            args: { company: select.value },
-          })
-          .then((response) => {
-            lite.state.context = Object.assign({}, lite.state.context || {}, {
-              active_company: response.message.company,
-            });
-
-            frappe.show_alert({
-              message: __("Empresa cambiada a {0}.", [response.message.company]),
-              indicator: "green",
-            });
-
-            window.location.reload();
-          });
-      });
-
-      document.body.appendChild(wrap);
-      document.body.classList.add("lite-ops-user");
-      lite.state.switcherReady = true;
+        lite.applyListLiteMode(listview, config);
+      },
     });
   };
 
   lite.initialize = function () {
+    lite.removeCompanySwitcher();
+    lite.observeCompanySwitcher();
+
     if (!lite.isLiteUser()) {
       return;
     }
 
-    lite.renderCompanySwitcher();
     lite.scheduleNavigationPrune();
     lite.observeNavigation();
 
