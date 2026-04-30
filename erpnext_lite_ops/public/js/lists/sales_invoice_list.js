@@ -1,3 +1,3 @@
-erpnext_lite_ops.extendListViewSettings("Quotation", {
+erpnext_lite_ops.extendListViewSettings("Sales Invoice", {
   company_field: "company",
 });
