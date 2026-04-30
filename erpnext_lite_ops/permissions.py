@@ -8,8 +8,10 @@ from .constants import ROLE_NAME
 COMPANY_FIELD_BY_DOCTYPE = {
     "Quotation": "company",
     "Sales Order": "company",
+    "Delivery Note": "company",
     "Sales Invoice": "company",
     "Purchase Order": "company",
+    "Purchase Receipt": "company",
     "Purchase Invoice": "company",
     "Sales Taxes and Charges Template": "company",
     "Purchase Taxes and Charges Template": "company",
@@ -64,12 +66,20 @@ def sales_order_query(user: str | None = None) -> str | None:
     return _company_query("Sales Order", user=user)
 
 
+def delivery_note_query(user: str | None = None) -> str | None:
+    return _company_query("Delivery Note", user=user)
+
+
 def sales_invoice_query(user: str | None = None) -> str | None:
     return _company_query("Sales Invoice", user=user)
 
 
 def purchase_order_query(user: str | None = None) -> str | None:
     return _company_query("Purchase Order", user=user)
+
+
+def purchase_receipt_query(user: str | None = None) -> str | None:
+    return _company_query("Purchase Receipt", user=user)
 
 
 def purchase_invoice_query(user: str | None = None) -> str | None:
@@ -96,11 +106,19 @@ def sales_order_has_permission(doc, user: str | None = None, permission_type: st
     return _company_has_permission(doc, user=user, permission_type=permission_type)
 
 
+def delivery_note_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool | None:
+    return _company_has_permission(doc, user=user, permission_type=permission_type)
+
+
 def sales_invoice_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool | None:
     return _company_has_permission(doc, user=user, permission_type=permission_type)
 
 
 def purchase_order_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool | None:
+    return _company_has_permission(doc, user=user, permission_type=permission_type)
+
+
+def purchase_receipt_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool | None:
     return _company_has_permission(doc, user=user, permission_type=permission_type)
 
 
