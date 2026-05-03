@@ -48,6 +48,8 @@ frappe.provide("erpnext_lite_ops");
   lite.companySwitcherSelector = [
     ".lite-ops-company-switcher",
     ".company-switcher",
+    "#lite-ops-company-select",
+    "label[for='lite-ops-company-select']",
     "[data-label]",
     "[aria-label]",
     "[title]",
@@ -249,6 +251,8 @@ frappe.provide("erpnext_lite_ops");
     return [
       "empresas permitidas",
       "empresa permitida",
+      "sin empresas permitidas",
+      "sin empresa permitida",
       "companias permitidas",
       "compania permitida",
       "allowed companies",
@@ -276,6 +280,10 @@ frappe.provide("erpnext_lite_ops");
     const legacy = node.closest?.(".lite-ops-company-switcher, .company-switcher");
     if (legacy) {
       return legacy;
+    }
+
+    if (node.matches?.("#lite-ops-company-select, label[for='lite-ops-company-select']")) {
+      return node.parentElement || node;
     }
 
     const control =
@@ -316,6 +324,10 @@ frappe.provide("erpnext_lite_ops");
     }
 
     if (node.matches?.(".lite-ops-company-switcher, .company-switcher")) {
+      return true;
+    }
+
+    if (node.matches?.("#lite-ops-company-select, label[for='lite-ops-company-select']")) {
       return true;
     }
 
