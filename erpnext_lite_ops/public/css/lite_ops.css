@@ -1,8 +1,10 @@
-[data-lite-ops-hidden="1"] {
+[data-lite-ops-hidden="1"],
+[data-lite-ops-company-switcher-hidden="1"] {
   display: none !important;
 }
 
-body .lite-ops-company-switcher {
+body .lite-ops-company-switcher,
+body [data-lite-ops-company-switcher-hidden="1"] {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -10,31 +12,29 @@ body .lite-ops-company-switcher {
 }
 
 .lite-ops-page {
-  padding: 1.25rem;
-  border-radius: 28px;
-  background:
-    radial-gradient(circle at top right, rgba(224, 193, 149, 0.2), transparent 32%),
-    linear-gradient(180deg, #172127 0%, #1f2b32 100%);
+  padding: 1rem;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #10242c 0%, #18313a 100%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .lite-ops-hero {
   display: flex;
   flex-wrap: wrap;
-  align-items: end;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.6rem;
-  margin-bottom: 1.25rem;
-  border: 1px solid rgba(240, 223, 192, 0.14);
-  border-radius: 24px;
-  background: linear-gradient(145deg, #4b3a30 0%, #7b664c 100%);
+  padding: 1.25rem;
+  margin-bottom: 0.8rem;
+  border: 1px solid rgba(125, 211, 252, 0.28);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0f766e 0%, #2563eb 100%);
   color: #f3f8fb;
-  box-shadow: 0 22px 44px rgba(20, 15, 12, 0.3);
+  box-shadow: 0 18px 36px rgba(8, 29, 51, 0.26);
 }
 
 .lite-ops-hero-copy {
-  max-width: 760px;
+  max-width: 700px;
 }
 
 .lite-ops-kicker {
@@ -46,29 +46,48 @@ body .lite-ops-company-switcher {
   color: #f5fbff;
   font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
 .lite-ops-hero h1 {
-  margin: 0.8rem 0 0.65rem;
+  margin: 0.65rem 0 0.45rem;
   color: #ffffff;
-  font-size: clamp(2.2rem, 4vw, 3.4rem);
-  line-height: 0.98;
+  font-size: 3rem;
+  line-height: 1;
 }
 
 .lite-ops-hero p {
-  max-width: 58rem;
+  max-width: 54rem;
   margin: 0;
   color: rgba(243, 248, 251, 0.9);
-  font-size: 1.08rem;
-  line-height: 1.6;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 .lite-ops-hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+.lite-ops-section-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0 0 1rem;
+  padding: 0.45rem;
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lite-ops-section-nav-button.btn.btn-default {
+  min-height: 34px;
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.1);
+  color: #f5fbff;
+  padding-inline: 0.85rem;
 }
 
 .lite-ops-page .btn {
@@ -95,15 +114,16 @@ body .lite-ops-company-switcher {
 
 .lite-ops-sections {
   display: grid;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .lite-ops-section {
   background: linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%);
   border: 1px solid #dce8ee;
-  border-radius: 24px;
-  padding: 1.35rem;
-  box-shadow: 0 18px 36px rgba(8, 18, 24, 0.12);
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 14px 28px rgba(8, 18, 24, 0.1);
+  scroll-margin-top: 5rem;
 }
 
 .lite-ops-section-header {
@@ -120,36 +140,44 @@ body .lite-ops-company-switcher {
   opacity: 1 !important;
   text-shadow: none !important;
   font-weight: 800;
-  font-size: clamp(1.7rem, 2vw, 2.4rem);
+  font-size: 1.85rem;
   line-height: 1.05;
 }
 
 .lite-ops-section-header p {
   margin: 0.45rem 0 0;
   color: #5d7381;
-  font-size: 1.02rem;
+  font-size: 0.98rem;
 }
 
 .lite-ops-card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.8rem;
 }
 
 .lite-ops-card {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 250px;
-  padding: 1.1rem;
+  gap: 1rem;
+  min-height: 188px;
+  padding: 1rem;
   border: 1px solid #dce7ed;
-  border-radius: 20px;
+  border-radius: 8px;
   background: linear-gradient(180deg, #ffffff 0%, #f5f9fb 100%);
+}
+
+.lite-ops-card-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.8rem;
+  align-items: start;
 }
 
 .lite-ops-card-copy {
   display: grid;
-  gap: 0.55rem;
+  gap: 0.45rem;
 }
 
 .lite-ops-card h3 {
@@ -158,37 +186,43 @@ body .lite-ops-company-switcher {
   opacity: 1 !important;
   text-shadow: none !important;
   font-weight: 800;
-  font-size: 1.75rem;
+  font-size: 1.45rem;
   line-height: 1.08;
 }
 
 .lite-ops-card p {
   margin: 0;
   color: #607584;
-  font-size: 1rem;
-  line-height: 1.55;
+  font-size: 0.94rem;
+  line-height: 1.45;
 }
 
 .lite-ops-card-footer {
   display: flex;
   flex-wrap: wrap;
-  align-items: end;
-  justify-content: space-between;
-  gap: 0.85rem;
-  margin-top: 1.25rem;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
 }
 
 .lite-ops-count {
   color: #17313d;
-  font-size: clamp(2.35rem, 4vw, 3.2rem);
+  font-size: 2.35rem;
   font-weight: 800;
   line-height: 1;
+  text-align: right;
 }
 
 .lite-ops-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.lite-ops-actions .btn {
+  min-height: 34px;
+  padding-inline: 0.8rem;
 }
 
 .lite-ops-card .btn.btn-primary,
@@ -207,14 +241,14 @@ body .lite-ops-company-switcher {
 .lite-ops-support-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.7rem;
+  gap: 0.55rem;
 }
 
 .lite-ops-support-link {
   display: inline-flex;
   align-items: center;
-  min-height: 42px;
-  padding-inline: 0.95rem;
+  min-height: 34px;
+  padding-inline: 0.85rem;
 }
 
 body.lite-ops-user .navbar .search-bar,
@@ -226,15 +260,15 @@ body.lite-ops-user .global-search {
 @media (max-width: 991px) {
   .lite-ops-page {
     padding: 1rem;
-    border-radius: 22px;
+    border-radius: 18px;
   }
 
   .lite-ops-hero {
-    padding: 1.25rem;
+    padding: 1rem;
   }
 
   .lite-ops-card {
-    min-height: 220px;
+    min-height: 170px;
   }
 }
 
@@ -248,10 +282,23 @@ body.lite-ops-user .global-search {
   }
 
   .lite-ops-card h3 {
-    font-size: 1.45rem;
+    font-size: 1.3rem;
+  }
+
+  .lite-ops-card-main {
+    grid-template-columns: 1fr;
+  }
+
+  .lite-ops-count {
+    text-align: left;
   }
 
   .lite-ops-card-footer {
     align-items: start;
+    justify-content: flex-start;
+  }
+
+  .lite-ops-actions {
+    justify-content: flex-start;
   }
 }
