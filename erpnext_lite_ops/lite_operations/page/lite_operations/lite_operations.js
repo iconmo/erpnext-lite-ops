@@ -56,6 +56,10 @@ frappe.pages["lite-operations"].on_page_show = function (wrapper) {
     $target.find("[data-open-pos]").on("click", function () {
       open_pos_route();
     });
+
+    $target.find("[data-scroll-section]").on("click", function () {
+      scroll_to_lite_section($(this).data("scroll-section"));
+    });
   });
 };
 
@@ -67,6 +71,7 @@ function ensure_lite_ops_inline_styles() {
   const style = document.createElement("style");
   style.id = LITE_OPS_INLINE_STYLE_ID;
   style.textContent = `
+    [data-lite-ops-company-switcher-hidden="1"],
     body .lite-ops-company-switcher {
       display: none !important;
       visibility: hidden !important;
@@ -75,31 +80,29 @@ function ensure_lite_ops_inline_styles() {
     }
 
     .layout-main-section .lite-ops-page {
-      padding: 1.25rem !important;
-      border-radius: 28px !important;
-      background:
-        radial-gradient(circle at top right, rgba(224, 193, 149, 0.2), transparent 32%),
-        linear-gradient(180deg, #172127 0%, #1f2b32 100%) !important;
+      padding: 1rem !important;
+      border-radius: 20px !important;
+      background: linear-gradient(180deg, #10242c 0%, #18313a 100%) !important;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
     }
 
     .layout-main-section .lite-ops-hero {
       display: flex !important;
       flex-wrap: wrap !important;
-      align-items: end !important;
+      align-items: center !important;
       justify-content: space-between !important;
       gap: 1rem !important;
-      padding: 1.6rem !important;
-      margin-bottom: 1.25rem !important;
-      border: 1px solid rgba(240, 223, 192, 0.14) !important;
-      border-radius: 24px !important;
-      background: linear-gradient(145deg, #4b3a30 0%, #7b664c 100%) !important;
+      padding: 1.25rem !important;
+      margin-bottom: 0.8rem !important;
+      border: 1px solid rgba(125, 211, 252, 0.28) !important;
+      border-radius: 16px !important;
+      background: linear-gradient(135deg, #0f766e 0%, #2563eb 100%) !important;
       color: #f3f8fb !important;
-      box-shadow: 0 22px 44px rgba(20, 15, 12, 0.3) !important;
+      box-shadow: 0 18px 36px rgba(8, 29, 51, 0.26) !important;
     }
 
     .layout-main-section .lite-ops-hero-copy {
-      max-width: 760px !important;
+      max-width: 700px !important;
     }
 
     .layout-main-section .lite-ops-kicker {
@@ -111,24 +114,24 @@ function ensure_lite_ops_inline_styles() {
       color: #f5fbff !important;
       font-size: 0.82rem !important;
       font-weight: 700 !important;
-      letter-spacing: 0.04em !important;
+      letter-spacing: 0 !important;
       text-transform: uppercase !important;
     }
 
     .layout-main-section .lite-ops-hero h1 {
-      margin: 0.8rem 0 0.65rem !important;
+      margin: 0.65rem 0 0.45rem !important;
       color: #ffffff !important;
-      font-size: clamp(2.2rem, 4vw, 3.4rem) !important;
-      line-height: 0.98 !important;
+      font-size: 3rem !important;
+      line-height: 1 !important;
       opacity: 1 !important;
     }
 
     .layout-main-section .lite-ops-hero p {
-      max-width: 58rem !important;
+      max-width: 54rem !important;
       margin: 0 !important;
       color: rgba(243, 248, 251, 0.92) !important;
-      font-size: 1.08rem !important;
-      line-height: 1.6 !important;
+      font-size: 1rem !important;
+      line-height: 1.5 !important;
       opacity: 1 !important;
     }
 
@@ -136,6 +139,25 @@ function ensure_lite_ops_inline_styles() {
       display: flex !important;
       flex-wrap: wrap !important;
       gap: 0.75rem !important;
+    }
+
+    .layout-main-section .lite-ops-section-nav {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 0.55rem !important;
+      margin: 0 0 1rem !important;
+      padding: 0.45rem !important;
+      border: 1px solid rgba(125, 211, 252, 0.16) !important;
+      border-radius: 12px !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .layout-main-section .lite-ops-section-nav-button.btn.btn-default {
+      min-height: 34px !important;
+      border-color: rgba(255, 255, 255, 0.16) !important;
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: #f5fbff !important;
+      padding-inline: 0.85rem !important;
     }
 
     .layout-main-section .lite-ops-page .btn {
@@ -162,15 +184,16 @@ function ensure_lite_ops_inline_styles() {
 
     .layout-main-section .lite-ops-sections {
       display: grid !important;
-      gap: 1.25rem !important;
+      gap: 1rem !important;
     }
 
     .layout-main-section .lite-ops-section {
       background: linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%) !important;
       border: 1px solid #dce8ee !important;
-      border-radius: 24px !important;
-      padding: 1.35rem !important;
-      box-shadow: 0 18px 36px rgba(8, 18, 24, 0.12) !important;
+      border-radius: 14px !important;
+      padding: 1rem !important;
+      box-shadow: 0 14px 28px rgba(8, 18, 24, 0.1) !important;
+      scroll-margin-top: 5rem !important;
     }
 
     .layout-main-section .lite-ops-section-header {
@@ -191,7 +214,7 @@ function ensure_lite_ops_inline_styles() {
     }
 
     .layout-main-section .lite-ops-section-header h2 {
-      font-size: clamp(1.85rem, 2vw, 2.5rem) !important;
+      font-size: 1.85rem !important;
       line-height: 1.05 !important;
     }
 
@@ -204,63 +227,77 @@ function ensure_lite_ops_inline_styles() {
 
     .layout-main-section .lite-ops-section-header p {
       margin: 0.45rem 0 0 !important;
-      font-size: 1.04rem !important;
+      font-size: 0.98rem !important;
     }
 
     .layout-main-section .lite-ops-card-grid {
       display: grid !important;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
-      gap: 1rem !important;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+      gap: 0.8rem !important;
     }
 
     .layout-main-section .lite-ops-card {
       display: flex !important;
       flex-direction: column !important;
       justify-content: space-between !important;
-      min-height: 250px !important;
-      padding: 1.1rem !important;
+      gap: 1rem !important;
+      min-height: 188px !important;
+      padding: 1rem !important;
       border: 1px solid #dce7ed !important;
-      border-radius: 20px !important;
+      border-radius: 8px !important;
       background: linear-gradient(180deg, #ffffff 0%, #f5f9fb 100%) !important;
+    }
+
+    .layout-main-section .lite-ops-card-main {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) auto !important;
+      gap: 0.8rem !important;
+      align-items: start !important;
     }
 
     .layout-main-section .lite-ops-card-copy {
       display: grid !important;
-      gap: 0.55rem !important;
+      gap: 0.45rem !important;
     }
 
     .layout-main-section .lite-ops-card h3 {
-      font-size: 1.75rem !important;
+      font-size: 1.45rem !important;
       line-height: 1.08 !important;
     }
 
     .layout-main-section .lite-ops-card p {
       margin: 0 !important;
-      font-size: 1rem !important;
-      line-height: 1.55 !important;
+      font-size: 0.94rem !important;
+      line-height: 1.45 !important;
     }
 
     .layout-main-section .lite-ops-card-footer {
       display: flex !important;
       flex-wrap: wrap !important;
-      align-items: end !important;
-      justify-content: space-between !important;
-      gap: 0.85rem !important;
-      margin-top: 1.25rem !important;
+      align-items: center !important;
+      justify-content: flex-end !important;
+      gap: 0.6rem !important;
     }
 
     .layout-main-section .lite-ops-count {
       color: #17313d !important;
-      font-size: clamp(2.35rem, 4vw, 3.2rem) !important;
+      font-size: 2.35rem !important;
       font-weight: 800 !important;
       line-height: 1 !important;
       opacity: 1 !important;
+      text-align: right !important;
     }
 
     .layout-main-section .lite-ops-actions {
       display: flex !important;
       flex-wrap: wrap !important;
-      gap: 0.6rem !important;
+      gap: 0.5rem !important;
+      justify-content: flex-end !important;
+    }
+
+    .layout-main-section .lite-ops-actions .btn {
+      min-height: 34px !important;
+      padding-inline: 0.8rem !important;
     }
 
     .layout-main-section .lite-ops-card .btn.btn-primary,
@@ -279,28 +316,28 @@ function ensure_lite_ops_inline_styles() {
     .layout-main-section .lite-ops-support-links {
       display: flex !important;
       flex-wrap: wrap !important;
-      gap: 0.7rem !important;
+      gap: 0.55rem !important;
     }
 
     .layout-main-section .lite-ops-support-link {
       display: inline-flex !important;
       align-items: center !important;
-      min-height: 42px !important;
-      padding-inline: 0.95rem !important;
+      min-height: 34px !important;
+      padding-inline: 0.85rem !important;
     }
 
     @media (max-width: 991px) {
       .layout-main-section .lite-ops-page {
         padding: 1rem !important;
-        border-radius: 22px !important;
+        border-radius: 18px !important;
       }
 
       .layout-main-section .lite-ops-hero {
-        padding: 1.25rem !important;
+        padding: 1rem !important;
       }
 
       .layout-main-section .lite-ops-card {
-        min-height: 220px !important;
+        min-height: 170px !important;
       }
     }
 
@@ -314,11 +351,24 @@ function ensure_lite_ops_inline_styles() {
       }
 
       .layout-main-section .lite-ops-card h3 {
-        font-size: 1.45rem !important;
+        font-size: 1.3rem !important;
+      }
+
+      .layout-main-section .lite-ops-card-main {
+        grid-template-columns: 1fr !important;
+      }
+
+      .layout-main-section .lite-ops-count {
+        text-align: left !important;
       }
 
       .layout-main-section .lite-ops-card-footer {
         align-items: start !important;
+        justify-content: flex-start !important;
+      }
+
+      .layout-main-section .lite-ops-actions {
+        justify-content: flex-start !important;
       }
     }
   `;
@@ -342,7 +392,92 @@ function observe_legacy_company_switcher(pageState) {
 }
 
 function remove_legacy_company_switcher() {
-  document.querySelectorAll(".lite-ops-company-switcher").forEach((node) => node.remove());
+  if (window.erpnext_lite_ops?.removeCompanySwitcher) {
+    window.erpnext_lite_ops.removeCompanySwitcher(document);
+    return;
+  }
+
+  const selector = [
+    ".lite-ops-company-switcher",
+    ".company-switcher",
+    "[data-label]",
+    "[aria-label]",
+    "[title]",
+    "button",
+    "a",
+    "[role='button']",
+    ".dropdown-toggle",
+    ".dropdown-item",
+  ].join(",");
+
+  document.querySelectorAll(selector).forEach((node) => {
+    if (!is_company_switcher_node(node)) {
+      return;
+    }
+
+    const legacy = node.closest(".lite-ops-company-switcher, .company-switcher");
+    const control =
+      legacy ||
+      node.closest("button, a, [role='button'], .btn, .dropdown-toggle, .dropdown-item, [data-label]") ||
+      node;
+    const isDropdownToggle =
+      control.matches?.(".dropdown-toggle") ||
+      control.getAttribute?.("data-toggle") === "dropdown" ||
+      control.getAttribute?.("aria-haspopup") === "true";
+    const target =
+      legacy ||
+      (isDropdownToggle &&
+        control.closest(
+          ".page-actions .dropdown, .standard-actions .dropdown, .custom-actions .dropdown, .navbar .dropdown, .btn-group"
+        )) ||
+      control.closest(".dropdown-item, li, button, a, [role='button'], .btn, [data-label]") ||
+      control;
+
+    if (target === document.body || target === document.documentElement) {
+      return;
+    }
+
+    target.setAttribute("data-lite-ops-company-switcher-hidden", "1");
+    target.remove();
+  });
+}
+
+function normalize_company_switcher_text(value) {
+  const text = String(value || "");
+  const normalized = text.normalize ? text.normalize("NFD") : text;
+
+  return normalized
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function is_company_switcher_node(node) {
+  if (node.matches?.(".lite-ops-company-switcher, .company-switcher")) {
+    return true;
+  }
+
+  const text = normalize_company_switcher_text(
+    [
+      node.getAttribute?.("aria-label"),
+      node.getAttribute?.("title"),
+      node.getAttribute?.("data-label"),
+      node.getAttribute?.("data-original-title"),
+      node.textContent,
+    ]
+      .filter(Boolean)
+      .join(" ")
+  );
+
+  return [
+    "empresas permitidas",
+    "empresa permitida",
+    "companias permitidas",
+    "compania permitida",
+    "allowed companies",
+    "allowed company",
+  ].some((label) => text.includes(label));
 }
 
 function fetch_lite_context(force = false) {
@@ -397,21 +532,64 @@ function open_pos_route() {
   window.location.href = "/app/point-of-sale";
 }
 
+function get_lite_section_id(section) {
+  const source = String(section?.id || section?.label || "section");
+  const normalized = source.normalize ? source.normalize("NFD") : source;
+
+  return (
+    normalized
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "section"
+  );
+}
+
+function scroll_to_lite_section(sectionId) {
+  const rawId = String(sectionId || "");
+  const targetId = rawId.startsWith("lite-ops-section-") ? rawId : `lite-ops-section-${rawId}`;
+  const target = document.getElementById(targetId);
+
+  if (target?.scrollIntoView) {
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
 function render_lite_operations(context) {
+  const sectionNav = (context.sections || [])
+    .map((section) => {
+      const sectionId = get_lite_section_id(section);
+
+      return `
+        <button class="lite-ops-section-nav-button btn btn-default btn-sm" data-scroll-section="${frappe.utils.escape_html(sectionId)}">
+          ${frappe.utils.escape_html(section.label)}
+        </button>
+      `;
+    })
+    .concat(`
+      <button class="lite-ops-section-nav-button btn btn-default btn-sm" data-scroll-section="support">
+        ${__("Apoyo")}
+      </button>
+    `)
+    .join("");
+
   const sections = (context.sections || [])
     .map((section) => {
+      const sectionId = get_lite_section_id(section);
       const cards = (section.items || [])
         .map((item) => {
           const description = item.description || __("Acceso rapido a este flujo operativo.");
 
           return `
             <article class="lite-ops-card">
-              <div class="lite-ops-card-copy">
-                <h3>${frappe.utils.escape_html(item.label)}</h3>
-                <p>${frappe.utils.escape_html(description)}</p>
+              <div class="lite-ops-card-main">
+                <div class="lite-ops-card-copy">
+                  <h3>${frappe.utils.escape_html(item.label)}</h3>
+                  <p>${frappe.utils.escape_html(description)}</p>
+                </div>
+                <div class="lite-ops-count">${frappe.format(item.count || 0, { fieldtype: "Int" })}</div>
               </div>
               <div class="lite-ops-card-footer">
-                <div class="lite-ops-count">${frappe.format(item.count || 0, { fieldtype: "Int" })}</div>
                 <div class="lite-ops-actions">
                   <button class="btn btn-default btn-sm" data-open-list="${frappe.utils.escape_html(item.doctype)}">
                     ${__("Abrir lista")}
@@ -427,7 +605,7 @@ function render_lite_operations(context) {
         .join("");
 
       return `
-        <section class="lite-ops-section">
+        <section class="lite-ops-section" id="lite-ops-section-${frappe.utils.escape_html(sectionId)}">
           <div class="lite-ops-section-header">
             <div>
               <h2>${frappe.utils.escape_html(section.label)}</h2>
@@ -466,9 +644,13 @@ function render_lite_operations(context) {
         </div>
       </section>
 
+      <nav class="lite-ops-section-nav" aria-label="${__("Secciones")}">
+        ${sectionNav}
+      </nav>
+
       <div class="lite-ops-sections">
         ${sections}
-        <section class="lite-ops-section">
+        <section class="lite-ops-section" id="lite-ops-section-support">
           <div class="lite-ops-section-header">
             <div>
               <h2>Registros de apoyo</h2>
