@@ -72,7 +72,9 @@ function ensure_lite_ops_inline_styles() {
   style.id = LITE_OPS_INLINE_STYLE_ID;
   style.textContent = `
     [data-lite-ops-company-switcher-hidden="1"],
-    body .lite-ops-company-switcher {
+    body .lite-ops-company-switcher,
+    body #lite-ops-company-select,
+    body label[for="lite-ops-company-select"] {
       display: none !important;
       visibility: hidden !important;
       opacity: 0 !important;
@@ -400,6 +402,8 @@ function remove_legacy_company_switcher() {
   const selector = [
     ".lite-ops-company-switcher",
     ".company-switcher",
+    "#lite-ops-company-select",
+    "label[for='lite-ops-company-select']",
     "[data-label]",
     "[aria-label]",
     "[title]",
@@ -416,8 +420,13 @@ function remove_legacy_company_switcher() {
     }
 
     const legacy = node.closest(".lite-ops-company-switcher, .company-switcher");
+    const oldSelectWrap =
+      !legacy && node.matches("#lite-ops-company-select, label[for='lite-ops-company-select']")
+        ? node.parentElement
+        : null;
     const control =
       legacy ||
+      oldSelectWrap ||
       node.closest("button, a, [role='button'], .btn, .dropdown-toggle, .dropdown-item, [data-label]") ||
       node;
     const isDropdownToggle =
@@ -426,6 +435,7 @@ function remove_legacy_company_switcher() {
       control.getAttribute?.("aria-haspopup") === "true";
     const target =
       legacy ||
+      oldSelectWrap ||
       (isDropdownToggle &&
         control.closest(
           ".page-actions .dropdown, .standard-actions .dropdown, .custom-actions .dropdown, .navbar .dropdown, .btn-group"
@@ -458,6 +468,10 @@ function is_company_switcher_node(node) {
     return true;
   }
 
+  if (node.matches?.("#lite-ops-company-select, label[for='lite-ops-company-select']")) {
+    return true;
+  }
+
   const text = normalize_company_switcher_text(
     [
       node.getAttribute?.("aria-label"),
@@ -473,6 +487,8 @@ function is_company_switcher_node(node) {
   return [
     "empresas permitidas",
     "empresa permitida",
+    "sin empresas permitidas",
+    "sin empresa permitida",
     "companias permitidas",
     "compania permitida",
     "allowed companies",
