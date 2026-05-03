@@ -8,8 +8,8 @@ app_email = "support@example.com"
 app_license = "MIT"
 required_apps = ["erpnext"]
 
-app_include_js = ["/assets/erpnext_lite_ops/js/lite_ops_boot.js"]
-app_include_css = ["/assets/erpnext_lite_ops/css/lite_ops.css"]
+app_include_js = ["/assets/erpnext_lite_ops/js/lite_ops_boot_v2.js"]
+app_include_css = ["/assets/erpnext_lite_ops/css/lite_ops_v2.css"]
 
 after_install = "erpnext_lite_ops.install.after_install"
 after_migrate = "erpnext_lite_ops.install.after_migrate"
