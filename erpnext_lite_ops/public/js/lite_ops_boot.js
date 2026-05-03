@@ -45,6 +45,19 @@ frappe.provide("erpnext_lite_ops");
     switcherObserver: null,
   };
 
+  lite.companySwitcherSelector = [
+    ".lite-ops-company-switcher",
+    ".company-switcher",
+    "[data-label]",
+    "[aria-label]",
+    "[title]",
+    "button",
+    "a",
+    "[role='button']",
+    ".dropdown-toggle",
+    ".dropdown-item",
+  ].join(",");
+
   lite.slug = function (value) {
     if (frappe.router?.slug) {
       return frappe.router.slug(value);
@@ -216,8 +229,118 @@ frappe.provide("erpnext_lite_ops");
     target.setAttribute("data-lite-ops-hidden", "1");
   };
 
-  lite.removeCompanySwitcher = function () {
-    document.querySelectorAll(".lite-ops-company-switcher").forEach((node) => node.remove());
+  lite.normalizeSwitcherText = function (value) {
+    const text = String(value || "");
+    const normalized = text.normalize ? text.normalize("NFD") : text;
+
+    return normalized
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .trim();
+  };
+
+  lite.matchesCompanySwitcherText = function (value) {
+    const text = lite.normalizeSwitcherText(value);
+    if (!text) {
+      return false;
+    }
+
+    return [
+      "empresas permitidas",
+      "empresa permitida",
+      "companias permitidas",
+      "compania permitida",
+      "allowed companies",
+      "allowed company",
+    ].some((label) => text.includes(label));
+  };
+
+  lite.getCompanySwitcherText = function (node) {
+    if (!node) {
+      return "";
+    }
+
+    return [
+      node.getAttribute?.("aria-label"),
+      node.getAttribute?.("title"),
+      node.getAttribute?.("data-label"),
+      node.getAttribute?.("data-original-title"),
+      node.textContent,
+    ]
+      .filter(Boolean)
+      .join(" ");
+  };
+
+  lite.getCompanySwitcherTarget = function (node) {
+    const legacy = node.closest?.(".lite-ops-company-switcher, .company-switcher");
+    if (legacy) {
+      return legacy;
+    }
+
+    const control =
+      node.closest?.(
+        "button, a, [role='button'], .btn, .dropdown-toggle, .dropdown-item, [data-label]"
+      ) || node;
+
+    if (
+      control.matches?.(".dropdown-toggle") ||
+      control.getAttribute?.("data-toggle") === "dropdown" ||
+      control.getAttribute?.("aria-haspopup") === "true"
+    ) {
+      return (
+        control.closest?.(
+          ".page-actions .dropdown, .standard-actions .dropdown, .custom-actions .dropdown, .navbar .dropdown, .btn-group"
+        ) || control
+      );
+    }
+
+    return (
+      control.closest?.(".dropdown-item, li, button, a, [role='button'], .btn, [data-label]") ||
+      control
+    );
+  };
+
+  lite.hideCompanySwitcherNode = function (node) {
+    if (!node || node === document.body || node === document.documentElement) {
+      return;
+    }
+
+    node.setAttribute("data-lite-ops-company-switcher-hidden", "1");
+    node.remove();
+  };
+
+  lite.isCompanySwitcherCandidate = function (node) {
+    if (!node || node.nodeType !== 1) {
+      return false;
+    }
+
+    if (node.matches?.(".lite-ops-company-switcher, .company-switcher")) {
+      return true;
+    }
+
+    return lite.matchesCompanySwitcherText(lite.getCompanySwitcherText(node));
+  };
+
+  lite.removeCompanySwitcher = function (root = document) {
+    const scope = root?.querySelectorAll ? root : document;
+    const candidates = [];
+
+    if (scope.nodeType === 1 && scope.matches?.(lite.companySwitcherSelector)) {
+      candidates.push(scope);
+    }
+
+    scope.querySelectorAll?.(lite.companySwitcherSelector).forEach((node) => {
+      candidates.push(node);
+    });
+
+    candidates.forEach((node) => {
+      if (!lite.isCompanySwitcherCandidate(node)) {
+        return;
+      }
+
+      lite.hideCompanySwitcherNode(lite.getCompanySwitcherTarget(node));
+    });
   };
 
   lite.observeCompanySwitcher = function () {
