@@ -4,6 +4,8 @@
 }
 
 body .lite-ops-company-switcher,
+body #lite-ops-company-select,
+body label[for="lite-ops-company-select"],
 body [data-lite-ops-company-switcher-hidden="1"] {
   display: none !important;
   visibility: hidden !important;
