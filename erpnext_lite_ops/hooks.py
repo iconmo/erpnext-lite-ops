@@ -21,6 +21,13 @@ after_migrate = "erpnext_lite_ops.install.after_migrate"
 doc_events = {
     "POS Invoice Merge Log": {
         "on_submit": "erpnext_lite_ops.pos_duplication.on_pos_invoice_merge_log_submit",
+        "on_update_after_submit": "erpnext_lite_ops.pos_duplication.on_pos_invoice_merge_log_update_after_submit",
+    },
+    "POS Closing Entry": {
+        "on_submit": "erpnext_lite_ops.pos_duplication.on_pos_closing_entry_submit",
+    },
+    "Sales Invoice": {
+        "on_submit": "erpnext_lite_ops.pos_duplication.on_sales_invoice_submit",
     },
     "Payment Entry": {
         "on_submit": "erpnext_lite_ops.pos_duplication.on_payment_entry_submit",
