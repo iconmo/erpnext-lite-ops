@@ -10,6 +10,7 @@ COMPANY_FIELD_BY_DOCTYPE = {
     "Sales Order": "company",
     "Delivery Note": "company",
     "Sales Invoice": "company",
+    "Payment Entry": "company",
     "Purchase Order": "company",
     "Purchase Receipt": "company",
     "Purchase Invoice": "company",
@@ -74,6 +75,10 @@ def sales_invoice_query(user: str | None = None) -> str | None:
     return _company_query("Sales Invoice", user=user)
 
 
+def payment_entry_query(user: str | None = None) -> str | None:
+    return _company_query("Payment Entry", user=user)
+
+
 def purchase_order_query(user: str | None = None) -> str | None:
     return _company_query("Purchase Order", user=user)
 
@@ -111,6 +116,10 @@ def delivery_note_has_permission(doc, user: str | None = None, permission_type: 
 
 
 def sales_invoice_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool | None:
+    return _company_has_permission(doc, user=user, permission_type=permission_type)
+
+
+def payment_entry_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool | None:
     return _company_has_permission(doc, user=user, permission_type=permission_type)
 
 
