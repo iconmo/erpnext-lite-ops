@@ -22,6 +22,60 @@ def on_pos_invoice_merge_log_submit(doc, method: str | None = None) -> None:
     ERPNext stores the reliable cash/card split on the original POS Invoices,
     so this hook deliberately does not read Sales Invoice payments.
     """
+    _duplicate_from_pos_invoice_merge_log(doc, f"POS Invoice Merge Log submit: {doc.name}")
+
+
+def on_pos_invoice_merge_log_update_after_submit(doc, method: str | None = None) -> None:
+    _duplicate_from_pos_invoice_merge_log(
+        doc,
+        f"POS Invoice Merge Log update after submit: {doc.name}",
+    )
+
+
+def on_pos_closing_entry_submit(doc, method: str | None = None) -> None:
+    if doc.get("company") and doc.company != SOURCE_COMPANY:
+        return
+
+    merge_logs = frappe.get_all(
+        "POS Invoice Merge Log",
+        filters={"pos_closing_entry": doc.name, "docstatus": 1},
+        fields=["name"],
+        limit_page_length=0,
+    )
+
+    for row in merge_logs:
+        merge_log = frappe.get_doc("POS Invoice Merge Log", row.name)
+        _duplicate_from_pos_invoice_merge_log(
+            merge_log,
+            f"POS Closing Entry submit: {doc.name}",
+        )
+
+
+def on_sales_invoice_submit(doc, method: str | None = None) -> None:
+    if not _is_supported_source_invoice(doc):
+        return
+
+    if not cint(doc.get("is_pos")):
+        return
+
+    pos_invoice_names = _get_pos_invoice_names(doc.name)
+    if not pos_invoice_names:
+        return
+
+    if not _sales_invoice_is_fully_paid(doc):
+        return
+
+    _duplicate_safely(
+        source=doc,
+        payment_totals_factory=lambda: _payment_totals_from_pos_invoices(
+            doc.name,
+            pos_invoice_names=pos_invoice_names,
+        ),
+        context=f"Sales Invoice POS fallback submit: {doc.name}",
+    )
+
+
+def _duplicate_from_pos_invoice_merge_log(doc, context: str) -> None:
     if doc.get("company") and doc.company != SOURCE_COMPANY:
         return
 
@@ -45,7 +99,7 @@ def on_pos_invoice_merge_log_submit(doc, method: str | None = None) -> None:
             source.name,
             merge_log=doc,
         ),
-        context=f"POS Invoice Merge Log submit: {doc.name}",
+        context=context,
     )
 
 
@@ -303,8 +357,9 @@ def _payment_totals_for_retry(source) -> OrderedDict[str, float]:
 def _payment_totals_from_pos_invoices(
     sales_invoice: str,
     merge_log=None,
+    pos_invoice_names: list[str] | None = None,
 ) -> OrderedDict[str, float]:
-    pos_invoice_names = _get_pos_invoice_names(sales_invoice, merge_log=merge_log)
+    pos_invoice_names = pos_invoice_names or _get_pos_invoice_names(sales_invoice, merge_log=merge_log)
     if not pos_invoice_names:
         raise LiteOpsDuplicationError(
             f"No POS Invoices are linked to consolidated Sales Invoice {sales_invoice}."
