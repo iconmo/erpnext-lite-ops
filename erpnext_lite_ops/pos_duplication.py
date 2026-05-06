@@ -22,9 +22,6 @@ def on_sales_invoice_submit(doc, method: str | None = None) -> None:
     if cint(doc.get("is_return")):
         return
 
-    if doc.meta.has_field("is_consolidated") and not cint(doc.get("is_consolidated")):
-        return
-
     if not _sales_invoice_is_fully_paid(doc):
         return
 
@@ -64,6 +61,43 @@ def on_payment_entry_submit(doc, method: str | None = None) -> None:
             payment_totals=_payment_totals_from_payment_entries(source.name),
             context=f"Payment Entry submit: {doc.name}",
         )
+
+
+@frappe.whitelist()
+def retry_sales_invoice(source_name: str) -> dict:
+    source = frappe.get_doc("Sales Invoice", source_name)
+    if source.company != SOURCE_COMPANY:
+        frappe.throw(f"Only {SOURCE_COMPANY} invoices can be duplicated.")
+    if source.docstatus != 1:
+        frappe.throw("Only submitted Sales Invoices can be duplicated.")
+    if cint(source.get("is_return")):
+        frappe.throw("Return invoices are not supported by this duplicate flow.")
+    if flt(source.outstanding_amount, 2) > ROUNDING_TOLERANCE:
+        frappe.throw("Only fully paid Sales Invoices can be duplicated.")
+
+    payment_totals = (
+        _payment_totals_from_sales_invoice(source)
+        if cint(source.get("is_pos"))
+        else _payment_totals_from_payment_entries(source.name)
+    )
+
+    savepoint = f"lite_ops_dup_{frappe.generate_hash(length=8)}"
+    frappe.db.savepoint(savepoint)
+
+    try:
+        duplicate = _duplicate_sales_invoice(source, payment_totals)
+    except Exception:
+        frappe.db.rollback(save_point=savepoint)
+        frappe.log_error(
+            title="Lite Ops manual invoice duplication failed",
+            message=f"Manual retry\nSource: {source.name}\n\n{frappe.get_traceback()}",
+        )
+        frappe.throw("Clean Corp duplicate failed. Check Error Log for details.")
+
+    if not duplicate:
+        return {"created": False, "message": "Duplicate already exists."}
+
+    return {"created": True, "name": duplicate}
 
 
 def _duplicate_safely(source, payment_totals: OrderedDict[str, float], context: str) -> str | None:
@@ -338,7 +372,6 @@ def _get_paid_to_account(mode_of_payment: str, target) -> str:
         {"parent": mode_of_payment, "company": TARGET_COMPANY},
         "default_account",
     )
-    paid_to_account = paid_to_account or target.default_bank_account
     if not paid_to_account:
         raise LiteOpsDuplicationError(
             f"No {TARGET_COMPANY} payment account found for mode of payment {mode_of_payment}."
