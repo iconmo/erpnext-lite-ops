@@ -11,8 +11,21 @@ required_apps = ["erpnext"]
 app_include_js = ["/assets/erpnext_lite_ops/js/lite_ops_boot_v2.js"]
 app_include_css = ["/assets/erpnext_lite_ops/css/lite_ops_v2.css"]
 
+page_js = {
+    "point-of-sale": "public/js/pos_unpaid_invoice.js",
+}
+
 after_install = "erpnext_lite_ops.install.after_install"
 after_migrate = "erpnext_lite_ops.install.after_migrate"
+
+doc_events = {
+    "Sales Invoice": {
+        "on_submit": "erpnext_lite_ops.pos_duplication.on_sales_invoice_submit",
+    },
+    "Payment Entry": {
+        "on_submit": "erpnext_lite_ops.pos_duplication.on_payment_entry_submit",
+    },
+}
 
 add_to_apps_screen = [
     {
@@ -32,6 +45,7 @@ doctype_js = {
     "Sales Order": "public/js/forms/sales_order.js",
     "Delivery Note": "public/js/forms/delivery_note.js",
     "Sales Invoice": "public/js/forms/sales_invoice.js",
+    "Payment Entry": "public/js/forms/payment_entry.js",
     "Purchase Order": "public/js/forms/purchase_order.js",
     "Purchase Receipt": "public/js/forms/purchase_receipt.js",
     "Purchase Invoice": "public/js/forms/purchase_invoice.js",
@@ -44,6 +58,7 @@ doctype_list_js = {
     "Sales Order": "public/js/lists/sales_order_list.js",
     "Delivery Note": "public/js/lists/delivery_note_list.js",
     "Sales Invoice": "public/js/lists/sales_invoice_list.js",
+    "Payment Entry": "public/js/lists/payment_entry_list.js",
     "Purchase Order": "public/js/lists/purchase_order_list.js",
     "Purchase Receipt": "public/js/lists/purchase_receipt_list.js",
     "Purchase Invoice": "public/js/lists/purchase_invoice_list.js",
@@ -56,6 +71,7 @@ permission_query_conditions = {
     "Sales Order": "erpnext_lite_ops.permissions.sales_order_query",
     "Delivery Note": "erpnext_lite_ops.permissions.delivery_note_query",
     "Sales Invoice": "erpnext_lite_ops.permissions.sales_invoice_query",
+    "Payment Entry": "erpnext_lite_ops.permissions.payment_entry_query",
     "Purchase Order": "erpnext_lite_ops.permissions.purchase_order_query",
     "Purchase Receipt": "erpnext_lite_ops.permissions.purchase_receipt_query",
     "Purchase Invoice": "erpnext_lite_ops.permissions.purchase_invoice_query",
@@ -68,6 +84,7 @@ has_permission = {
     "Sales Order": "erpnext_lite_ops.permissions.sales_order_has_permission",
     "Delivery Note": "erpnext_lite_ops.permissions.delivery_note_has_permission",
     "Sales Invoice": "erpnext_lite_ops.permissions.sales_invoice_has_permission",
+    "Payment Entry": "erpnext_lite_ops.permissions.payment_entry_has_permission",
     "Purchase Order": "erpnext_lite_ops.permissions.purchase_order_has_permission",
     "Purchase Receipt": "erpnext_lite_ops.permissions.purchase_receipt_has_permission",
     "Purchase Invoice": "erpnext_lite_ops.permissions.purchase_invoice_has_permission",
