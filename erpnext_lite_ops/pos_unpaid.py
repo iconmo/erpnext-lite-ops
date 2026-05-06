@@ -4,7 +4,7 @@ import frappe
 from frappe import _
 from frappe.utils import cint, flt, nowdate, nowtime
 
-from .api import _user_has_lite_role
+from .api import _user_has_lite_role, get_allowed_companies
 from .constants import SOURCE_COMPANY
 
 GENERIC_CUSTOMERS = {"guest", "walk-in customer", "cash customer"}
@@ -83,6 +83,9 @@ def create_unpaid_sales_invoice(source_doc) -> dict:
     source = frappe._dict(frappe.parse_json(source_doc) or {})
     if source.get("company") != SOURCE_COMPANY:
         frappe.throw(_("Unpaid POS invoices can only be created for {0}.").format(SOURCE_COMPANY))
+
+    _validate_source_company_access()
+    _validate_pos_profile_company(source.get("pos_profile"))
 
     if _has_payment_amount(source):
         frappe.throw(_("This cart already has a payment. Use normal POS checkout for paid sales."))
@@ -171,6 +174,20 @@ def _validate_customer(source) -> None:
     default_customer = _get_pos_profile_default_customer(source.get("pos_profile"))
     if default_customer and customer == default_customer:
         frappe.throw(_("Choose a real customer before creating an unpaid invoice."))
+
+
+def _validate_source_company_access() -> None:
+    if SOURCE_COMPANY not in get_allowed_companies():
+        frappe.throw(_("You are not allowed to create invoices for {0}.").format(SOURCE_COMPANY))
+
+
+def _validate_pos_profile_company(pos_profile: str | None) -> None:
+    if not pos_profile:
+        return
+
+    profile_company = frappe.db.get_value("POS Profile", pos_profile, "company")
+    if profile_company and profile_company != SOURCE_COMPANY:
+        frappe.throw(_("POS Profile {0} does not belong to {1}.").format(pos_profile, SOURCE_COMPANY))
 
 
 def _get_pos_profile_default_customer(pos_profile: str | None) -> str | None:
