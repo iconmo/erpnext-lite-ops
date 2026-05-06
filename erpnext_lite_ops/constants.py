@@ -4,6 +4,9 @@ APP_TITLE = "Lite Operations"
 APP_LABEL = "Operaciones Lite"
 APP_LOGO = "/assets/erpnext_lite_ops/lite_ops_logo.svg"
 ALLOWED_ROUTES = ["point-of-sale"]
+SOURCE_COMPANY = "BazarT"
+TARGET_COMPANY = "Clean Corp"
+CASH_MODE_KEYWORD = "cash"
 
 TOP_LEVEL_DOCTYPES = [
     "Item",
@@ -13,6 +16,7 @@ TOP_LEVEL_DOCTYPES = [
     "Sales Order",
     "Delivery Note",
     "Sales Invoice",
+    "Payment Entry",
     "Purchase Order",
     "Purchase Receipt",
     "Purchase Invoice",
@@ -23,6 +27,7 @@ TRANSACTION_DOCTYPES = [
     "Sales Order",
     "Delivery Note",
     "Sales Invoice",
+    "Payment Entry",
     "Purchase Order",
     "Purchase Receipt",
     "Purchase Invoice",
