@@ -2,7 +2,7 @@ from .constants import APP_LABEL, APP_LOGO, APP_ROUTE, ROLE_NAME
 
 app_name = "erpnext_lite_ops"
 app_title = "ERPNext Lite Operations"
-app_publisher = "OpenAI Codex"
+app_publisher = "mo"
 app_description = "Simplified multi-company ERPNext operations UI."
 app_email = "support@example.com"
 app_license = "MIT"
