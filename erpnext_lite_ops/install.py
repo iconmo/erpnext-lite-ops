@@ -20,6 +20,7 @@ ROLE_PERMISSIONS = {
     "Sales Order": {"read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "print": 1, "email": 1, "report": 1, "export": 1, "apply_user_permissions": 1},
     "Delivery Note": {"read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "print": 1, "email": 1, "report": 1, "export": 1, "apply_user_permissions": 1},
     "Sales Invoice": {"read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "print": 1, "email": 1, "report": 1, "export": 1, "apply_user_permissions": 1},
+    "Payment Entry": {"read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "print": 1, "email": 1, "report": 1, "export": 1, "apply_user_permissions": 1},
     "Purchase Order": {"read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "print": 1, "email": 1, "report": 1, "export": 1, "apply_user_permissions": 1},
     "Purchase Receipt": {"read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "print": 1, "email": 1, "report": 1, "export": 1, "apply_user_permissions": 1},
     "Purchase Invoice": {"read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "print": 1, "email": 1, "report": 1, "export": 1, "apply_user_permissions": 1},
